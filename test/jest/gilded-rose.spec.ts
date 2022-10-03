@@ -115,4 +115,33 @@ describe("Gilded Rose", () => {
          expect(items).toStrictEqual(expectedItems);
       });
    });
+
+   describe("Conjured items", () => {
+      it("Conjured items should decrease in quality twice as fast", () => {
+         const inputItems = [new Item("Conjured", 5, 10)];
+         const expectedItems = [new Item("Conjured", 4, 8)];
+         const gildedRose = new GildedRose(inputItems);
+         const items = gildedRose.updateQuality();
+
+         expect(items).toStrictEqual(expectedItems);
+      });
+
+      it("Conjured items never degrade in quality below 0", () => {
+         const inputItems = [new Item("Conjured", 0, 0)];
+         const expectedItems = [new Item("Conjured", -1, 0)];
+         const gildedRose = new GildedRose(inputItems);
+         const items = gildedRose.updateQuality();
+
+         expect(items).toStrictEqual(expectedItems);
+      });
+
+      it("Conjured items degrade in quality twice as fast once the sell by date has passed", () => {
+         const inputItems = [new Item("Conjured", 0, 10)];
+         const expectedItems = [new Item("Conjured", -1, 6)];
+         const gildedRose = new GildedRose(inputItems);
+         const items = gildedRose.updateQuality();
+
+         expect(items).toStrictEqual(expectedItems);
+      });
+   });
 });

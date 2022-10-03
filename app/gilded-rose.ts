@@ -50,7 +50,19 @@ export class GildedRose {
       }
    }
 
-   updateDefault(item: Item) {
+   private updateConjured(item: Item) {
+      if (isMoreThanMinQuality(item.quality)) {
+         item.quality = decreaseQuality(item.quality, 2);
+      }
+
+      item.sellIn = decreaseSellIn(item.sellIn);
+
+      if (isExpired(item.sellIn) && isMoreThanMinQuality(item.quality)) {
+         item.quality = decreaseQuality(item.quality, 2);
+      }
+   }
+
+   private updateDefault(item: Item) {
       if (isMoreThanMinQuality(item.quality)) {
          item.quality = decreaseQuality(item.quality);
       }
@@ -72,6 +84,9 @@ export class GildedRose {
                break;
             case types.BRIE:
                this.updateBrie(item);
+               break;
+            case types.CONJURED:
+               this.updateConjured(item);
                break;
             case types.SULFURAS:
                this.updateSulfuras(item);
