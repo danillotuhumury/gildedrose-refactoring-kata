@@ -7,6 +7,9 @@
     "sourceMap": false,
     "baseUrl": "./",
     "paths": {
+      "@/utils/*": [
+        "app/utils/*"
+      ],
       "@/*": [
         "app/*"
       ]

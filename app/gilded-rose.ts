@@ -1,5 +1,15 @@
 import { Item } from "@/item";
 
+import {
+   increaseQuality,
+   decreaseQuality,
+   isExpired,
+   isLessThanMaxQuality,
+   isMoreThanMinQuality,
+   types,
+   decreaseSellIn,
+} from "@/utils/items";
+
 export class GildedRose {
    items: Array<Item>;
 
@@ -7,66 +17,63 @@ export class GildedRose {
       this.items = items;
    }
 
-   updateBrie(item: Item) {
-      if (item.quality < 50) {
-         item.quality = item.quality + 1;
+   private updateBackstagePass(item: Item) {
+      if (isLessThanMaxQuality(item.quality)) {
+         item.quality = increaseQuality(item.quality);
+
+         if (item.sellIn < 11 && isLessThanMaxQuality(item.quality)) {
+            item.quality = increaseQuality(item.quality);
+         }
+         if (item.sellIn < 6 && isLessThanMaxQuality(item.quality)) {
+            item.quality = increaseQuality(item.quality);
+         }
       }
 
-      item.sellIn = item.sellIn - 1;
+      item.sellIn = decreaseSellIn(item.sellIn);
 
-      if (item.sellIn < 0) {
-         if (item.quality < 50) {
-            item.quality = item.quality + 1;
+      if (isExpired(item.sellIn)) {
+         item.quality = item.quality - item.quality;
+      }
+   }
+
+   private updateBrie(item: Item) {
+      if (isLessThanMaxQuality(item.quality)) {
+         item.quality = increaseQuality(item.quality);
+      }
+
+      item.sellIn = decreaseSellIn(item.sellIn);
+
+      if (isExpired(item.sellIn)) {
+         if (isLessThanMaxQuality(item.quality)) {
+            item.quality = increaseQuality(item.quality);
          }
       }
    }
 
    updateDefault(item: Item) {
-      if (item.quality > 0) {
-         item.quality = item.quality - 1;
+      if (isMoreThanMinQuality(item.quality)) {
+         item.quality = decreaseQuality(item.quality);
       }
 
-      item.sellIn = item.sellIn - 1;
+      item.sellIn = decreaseSellIn(item.sellIn);
 
-      if (item.sellIn < 0 && item.quality > 0) {
-         item.quality = item.quality - 1;
-      }
-   }
-
-   updateSulfuras(item: Item) {}
-
-   updatePass(item: Item) {
-      if (item.quality < 50) {
-         item.quality = item.quality + 1;
-         if (item.sellIn < 11) {
-            if (item.quality < 50) {
-               item.quality = item.quality + 1;
-            }
-         }
-         if (item.sellIn < 6) {
-            if (item.quality < 50) {
-               item.quality = item.quality + 1;
-            }
-         }
-      }
-
-      item.sellIn = item.sellIn - 1;
-
-      if (item.sellIn < 0) {
-         item.quality = item.quality - item.quality;
+      if (isExpired(item.sellIn) && isMoreThanMinQuality(item.quality)) {
+         item.quality = decreaseQuality(item.quality);
       }
    }
+
+   private updateSulfuras(item: Item) {}
 
    updateQuality() {
-      this.items.forEach((item, index) => {
+      this.items.forEach((item) => {
          switch (item.name) {
-            case "Aged Brie":
+            case types.BACKSTAGE_PASS:
+               this.updateBackstagePass(item);
+               break;
+            case types.BRIE:
                this.updateBrie(item);
                break;
-            case "Backstage passes to a TAFKAL80ETC concert":
-               this.updatePass(item);
-               break;
-            case "Sulfuras, Hand of Ragnaros":
+            case types.SULFURAS:
                this.updateSulfuras(item);
                break;
             default:
